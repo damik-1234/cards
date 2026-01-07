@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D Lanovka</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: sans-serif;
+      background: rgba(0,0,0,0.5);
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+<div id="info">
+  WASD – chůze<br>
+  Myš – rozhlížení<br>
+  E – lanovka
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/PointerLockControls.js"></script>
+
+<script>
+let scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Světlo
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+let sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(100,100,50);
+scene.add(sun);
+
+// Zem
+let ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(200,200),
+  new THREE.MeshStandardMaterial({color: 0x228B22})
+);
+ground.rotation.x = -Math.PI/2;
+scene.add(ground);
+
+// Hory
+for(let i=0;i<20;i++){
+  let hill = new THREE.Mesh(
+    new THREE.ConeGeometry(5+Math.random()*10, 20+Math.random()*30, 8),
+    new THREE.MeshStandardMaterial({color: 0x556B2F})
+  );
+  hill.position.set(
+    (Math.random()-0.5)*150,
+    hill.geometry.parameters.height/2,
+    (Math.random()-0.5)*150
+  );
+  scene.add(hill);
+}
+
+// Ovládání
+let controls = new THREE.PointerLockControls(camera, document.body);
+document.body.addEventListener('click', () => controls.lock());
+scene.add(controls.getObject());
+camera.position.y = 2;
+
+// Pohyb
+let keys = {};
+document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+// Lanovka
+let cable = new THREE.Mesh(
+  new THREE.BoxGeometry(4,2,4),
+  new THREE.MeshStandardMaterial({color: 0xff0000})
+);
+scene.add(cable);
+
+let start = new THREE.Vector3(-30,10,-30);
+let end = new THREE.Vector3(30,30,30);
+let t = 0;
+let riding = false;
+
+// Lano (vizuální)
+let rope = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([start,end]),
+  new THREE.LineBasicMaterial({color: 0x000000})
+);
+scene.add(rope);
+
+document.addEventListener('keydown', e => {
+  if(e.key.toLowerCase() === 'e'){
+    let d = camera.position.distanceTo(cable.position);
+    if(d < 5){
+      riding = !riding;
+    }
+  }
+});
+
+function animate(){
+  requestAnimationFrame(animate);
+
+  if(!riding){
+    let speed = 0.1;
+    if(keys['w']) controls.moveForward(speed);
+    if(keys['s']) controls.moveForward(-speed);
+    if(keys['a']) controls.moveRight(-speed);
+    if(keys['d']) controls.moveRight(speed);
+  } else {
+    t += 0.001;
+    if(t > 1) t = 0;
+    cable.position.lerpVectors(start, end, t);
+    camera.position.copy(cable.position).add(new THREE.Vector3(0,2,0));
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>

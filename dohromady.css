@@ -106,5 +106,5 @@ text-decoration: underline;
 }
  main {
     flex: 1;
-    background-color: black;
+    background-color: rgb(85, 144, 212);
 }
