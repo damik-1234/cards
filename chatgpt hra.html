@@ -1,126 +1,155 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <title>3D Lanovka</title>
-  <style>
-    body { margin: 0; overflow: hidden; }
-    #info {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: white;
-      font-family: sans-serif;
-      background: rgba(0,0,0,0.5);
-      padding: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>3D Lanovka s Texturami</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #ui { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 8px; pointer-events: none; }
+    </style>
 </head>
 <body>
-<div id="info">
-  WASD – chůze<br>
-  Myš – rozhlížení<br>
-  E – lanovka
-</div>
+    <div id="ui">
+        <b>W,A,S,D</b> - Pohyb | <b>Myš</b> - Rozhlížení (klikni do okna)<br>
+        Nastup do červené kabiny a vyjeď na horu!
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/controls/PointerLockControls.js"></script>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com" } }
+    </script>
 
-<script>
-let scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
+    <script type="module">
+        import * as THREE from 'three';
 
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-let renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+        // --- POMOCNÁ FUNKCE PRO GENEROVÁNÍ TEXTUR ---
+        function createNoiseTexture(color1, color2, size = 256) {
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            for (let i = 0; i < size; i += 4) {
+                for (let j = 0; j < size; j += 4) {
+                    ctx.fillStyle = Math.random() > 0.5 ? color1 : color2;
+                    ctx.fillRect(i, j, 4, 4);
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(10, 10);
+            return tex;
+        }
 
-// Světlo
-scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-let sun = new THREE.DirectionalLight(0xffffff, 0.8);
-sun.position.set(100,100,50);
-scene.add(sun);
+        // --- SCÉNA A RENDERER ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87ceeb);
+        scene.fog = new THREE.Fog(0x87ceeb, 10, 150);
 
-// Zem
-let ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(200,200),
-  new THREE.MeshStandardMaterial({color: 0x228B22})
-);
-ground.rotation.x = -Math.PI/2;
-scene.add(ground);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-// Hory
-for(let i=0;i<20;i++){
-  let hill = new THREE.Mesh(
-    new THREE.ConeGeometry(5+Math.random()*10, 20+Math.random()*30, 8),
-    new THREE.MeshStandardMaterial({color: 0x556B2F})
-  );
-  hill.position.set(
-    (Math.random()-0.5)*150,
-    hill.geometry.parameters.height/2,
-    (Math.random()-0.5)*150
-  );
-  scene.add(hill);
-}
+        // --- SVĚTLO ---
+        const light = new THREE.DirectionalLight(0xffffff, 1.2);
+        light.position.set(50, 100, 50);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
 
-// Ovládání
-let controls = new THREE.PointerLockControls(camera, document.body);
-document.body.addEventListener('click', () => controls.lock());
-scene.add(controls.getObject());
-camera.position.y = 2;
+        // --- OBJEKTY S TEXTURAMI ---
+        
+        // Tráva (Země)
+        const grassTex = createNoiseTexture('#2d5a27', '#3a7d32');
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(500, 500),
+            new THREE.MeshLambertMaterial({ map: grassTex })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        scene.add(ground);
 
-// Pohyb
-let keys = {};
-document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
-document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+        // Hora (Skála)
+        const rockTex = createNoiseTexture('#555555', '#777777');
+        rockTex.repeat.set(2, 5);
+        const mountain = new THREE.Mesh(
+            new THREE.ConeGeometry(30, 80, 8),
+            new THREE.MeshLambertMaterial({ map: rockTex })
+        );
+        mountain.position.set(0, 40, -80);
+        scene.add(mountain);
 
-// Lanovka
-let cable = new THREE.Mesh(
-  new THREE.BoxGeometry(4,2,4),
-  new THREE.MeshStandardMaterial({color: 0xff0000})
-);
-scene.add(cable);
+        // Lanovka
+        const carGroup = new THREE.Group();
+        const carMat = new THREE.MeshPhongMaterial({ color: 0xaa0000, shininess: 80 });
+        const carBody = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 4), carMat);
+        carGroup.add(carBody);
+        
+        // Okna lanovky
+        const winMat = new THREE.MeshPhongMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 });
+        const windowFront = new THREE.Mesh(new THREE.BoxGeometry(3.5, 1.5, 0.1), winMat);
+        windowFront.position.set(0, 0.5, 2.01);
+        carGroup.add(windowFront);
 
-let start = new THREE.Vector3(-30,10,-30);
-let end = new THREE.Vector3(30,30,30);
-let t = 0;
-let riding = false;
+        carGroup.position.set(0, 1.6, -15);
+        scene.add(carGroup);
 
-// Lano (vizuální)
-let rope = new THREE.Line(
-  new THREE.BufferGeometry().setFromPoints([start,end]),
-  new THREE.LineBasicMaterial({color: 0x000000})
-);
-scene.add(rope);
+        // Lana
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x333333 });
+        const linePoints = [new THREE.Vector3(0, 2, -15), new THREE.Vector3(0, 75, -75)];
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
+        const cable = new THREE.Line(lineGeo, lineMat);
+        scene.add(cable);
 
-document.addEventListener('keydown', e => {
-  if(e.key.toLowerCase() === 'e'){
-    let d = camera.position.distanceTo(cable.position);
-    if(d < 5){
-      riding = !riding;
-    }
-  }
-});
+        // --- OVLÁDÁNÍ ---
+        let keys = {};
+        document.addEventListener('keydown', (e) => keys[e.code] = true);
+        document.addEventListener('keyup', (e) => keys[e.code] = false);
+        renderer.domElement.addEventListener('click', () => renderer.domElement.requestPointerLock());
 
-function animate(){
-  requestAnimationFrame(animate);
+        let yaw = 0, pitch = 0;
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement) {
+                yaw -= e.movementX * 0.002;
+                pitch = Math.max(-1.5, Math.min(1.5, pitch - e.movementY * 0.002));
+                camera.rotation.set(pitch, yaw, 0, 'YXZ');
+            }
+        });
 
-  if(!riding){
-    let speed = 0.1;
-    if(keys['w']) controls.moveForward(speed);
-    if(keys['s']) controls.moveForward(-speed);
-    if(keys['a']) controls.moveRight(-speed);
-    if(keys['d']) controls.moveRight(speed);
-  } else {
-    t += 0.001;
-    if(t > 1) t = 0;
-    cable.position.lerpVectors(start, end, t);
-    camera.position.copy(cable.position).add(new THREE.Vector3(0,2,0));
-  }
+        // --- ANIMACE ---
+        let carTime = 0;
+        const startPos = new THREE.Vector3(0, 1.6, -15);
+        const endPos = new THREE.Vector3(0, 72, -73);
 
-  renderer.render(scene, camera);
-}
-animate();
-</script>
+        function update() {
+            // Animace lanovky
+            carTime += 0.003;
+            const progress = (Math.sin(carTime) + 1) / 2;
+            const oldPos = carGroup.position.clone();
+            carGroup.position.lerpVectors(startPos, endPos, progress);
+
+            // Chůze
+            const speed = 0.15;
+            const dir = new THREE.Vector3();
+            if (keys['KeyW']) dir.z -= 1;
+            if (keys['KeyS']) dir.z += 1;
+            if (keys['KeyA']) dir.x -= 1;
+            if (keys['KeyD']) dir.x += 1;
+            
+            dir.applyQuaternion(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), yaw));
+            camera.position.addScaledVector(dir.normalize(), speed);
+
+            // Logika "nastoupení"
+            const dist = camera.position.distanceTo(carGroup.position);
+            if (dist < 3) {
+                const delta = carGroup.position.clone().sub(oldPos);
+                camera.position.add(delta); // Hráč se pohybuje s kabinou
+            } else {
+                camera.position.y = 1.7; // Udržuj hráče na zemi, pokud není v kabině
+            }
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(update);
+        }
+
+        camera.position.set(0, 1.7, 0);
+        update();
+    </script>
 </body>
 </html>
