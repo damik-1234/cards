@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>BoutForRich | Luxury Yacht Rental</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================================
+   RESET + ZÁKLAD
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Montserrat',sans-serif;
+    background:#070707;
+    color:#fff;
+    line-height:1.6;
+}
+
+/* =========================================================
+   BARVY
+========================================================= */
+
+:root{
+    --gold1:#d4af37;
+    --gold2:#ffdf6c;
+    --dark:#111;
+    --darker:#000;
+}
+
+/* =========================================================
+   HEADER / HERO
+========================================================= */
+
+header{
+    height:100vh;
+    background:url("https://images.unsplash.com/photo-1600195077078-7c815f540a3c") center/cover fixed;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+header::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.7);
+}
+
+.hero-content{
+    position:relative;
+    z-index:1;
+    text-align:center;
+}
+
+.hero-content h1{
+    font-family:'Playfair Display',serif;
+    font-size:5rem;
+    background:linear-gradient(45deg,var(--gold1),var(--gold2));
+    -webkit-background-clip:text;
+    color:transparent;
+    text-shadow:0 0 35px gold;
+}
+
+.hero-content p{
+    margin-top:20px;
+    font-size:1.4rem;
+    color:#ddd;
+}
+
+/* =========================================================
+   SEKCE
+========================================================= */
+
+section{
+    padding:110px 8%;
+}
+
+h2{
+    font-family:'Playfair Display',serif;
+    font-size:3rem;
+    margin-bottom:60px;
+    background:linear-gradient(45deg,var(--gold1),var(--gold2));
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+/* =========================================================
+   FLOTA
+========================================================= */
+
+.fleet{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+    gap:60px;
+}
+
+/* =========================================================
+   KARTA LODĚ
+========================================================= */
+
+.yacht{
+    background:var(--dark);
+    border-radius:22px;
+    overflow:hidden;
+    border:1px solid #333;
+    transform-style:preserve-3d;
+    transition:transform 0.4s, box-shadow 0.4s;
+}
+
+.yacht:hover{
+    box-shadow:0 0 50px rgba(212,175,55,0.45);
+}
+
+.yacht img{
+    width:100%;
+    height:260px;
+    object-fit:cover;
+}
+
+.yacht-content{
+    padding:30px;
+}
+
+.yacht-content h3{
+    font-size:1.7rem;
+    color:var(--gold2);
+}
+
+.yacht-content p{
+    margin:15px 0;
+    color:#ccc;
+}
+
+.price{
+    font-size:1.4rem;
+    font-weight:bold;
+    margin:10px 0;
+}
+
+.vip{
+    color:#ffd700;
+    margin-bottom:15px;
+}
+
+.yacht-content button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(45deg,var(--gold1),var(--gold2));
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* =========================================================
+   PROHLÍDKA LODĚ
+========================================================= */
+
+#tour{
+    display:none;
+    background:var(--darker);
+    border-top:2px solid gold;
+}
+
+.tour-wrapper{
+    max-width:1100px;
+    margin:auto;
+}
+
+.tour-title{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.slider{
+    position:relative;
+}
+
+.slider img{
+    width:100%;
+    border-radius:25px;
+    animation:fade 1.5s;
+}
+
+@keyframes fade{
+    from{opacity:0}
+    to{opacity:1}
+}
+
+/* =========================================================
+   POPIS PROHLÍDKY
+========================================================= */
+
+.tour-info{
+    margin-top:30px;
+    background:#111;
+    padding:30px;
+    border-radius:15px;
+    border:1px solid #333;
+}
+
+/* =========================================================
+   REZERVACE
+========================================================= */
+
+form{
+    max-width:650px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+input,select,button{
+    padding:15px;
+    border-radius:10px;
+    border:none;
+    font-size:1rem;
+}
+
+button{
+    background:linear-gradient(45deg,var(--gold1),var(--gold2));
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+    padding:40px;
+    background:#000;
+    text-align:center;
+    border-top:1px solid gold;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header>
+    <div class="hero-content">
+        <h1>BoutForRich</h1>
+        <p>Real Luxury Yachts • Real Interiors • VIP Experience</p>
+    </div>
+</header>
+
+<!-- ================= FLOTA ================= -->
+<section>
+<h2>Naše skutečné jachty</h2>
+
+<div class="fleet">
+
+<!-- ================= LOD 1 ================= -->
+<div class="yacht">
+<img src="https://images.unsplash.com/photo-1600195077078-7c815f540a3c">
+<div class="yacht-content">
+<h3>Golden Majesty 52</h3>
+<p>Luxusní motorová jachta s plně vybaveným interiérem, kajutami a horní palubou.</p>
+<div class="price">140 000 Kč / den</div>
+<div class="vip">VIP servis: +30 % (kapitán, catering, champagne)</div>
+<button onclick="startTour(0)">Virtuální prohlídka</button>
+</div>
+</div>
+
+<!-- ================= LOD 2 ================= -->
+<div class="yacht">
+<img src="https://images.unsplash.com/photo-1569263979104-865ab7cd8d13">
+<div class="yacht-content">
+<h3>Royal Interior 60</h3>
+<p>Prémiová jachta zaměřená na interiér – salon, ložnice, koupelny.</p>
+<div class="price">185 000 Kč / den</div>
+<div class="vip">VIP servis: +35 %</div>
+<button onclick="startTour(1)">Virtuální prohlídka</button>
+</div>
+</div>
+
+<!-- ================= LOD 3 ================= -->
+<div class="yacht">
+<img src="https://images.unsplash.com/photo-1599586120429-48281b6f0ece">
+<div class="yacht-content">
+<h3>Diamond Suite Yacht</h3>
+<p>Ultra luxury yacht se zaměřením na komfort, design a soukromí.</p>
+<div class="price">240 000 Kč / den</div>
+<div class="vip">VIP servis: +40 %</div>
+<button onclick="startTour(2)">Virtuální prohlídka</button>
+</div>
+</div>
+
+</div>
+</section>
+
+<!-- ================= PROHLÍDKA ================= -->
+<section id="tour">
+<div class="tour-wrapper">
+
+<div class="tour-title">
+<h2>Virtuální prohlídka skutečné jachty</h2>
+</div>
+
+<div class="slider">
+<img id="slide">
+</div>
+
+<div class="tour-info" id="tourText">
+</div>
+
+</div>
+</section>
+
+<!-- ================= REZERVACE ================= -->
+<section>
+<h2>Rezervace jachty</h2>
+
+<form onsubmit="reserve(event)">
+<input type="text" placeholder="Jméno a příjmení" required>
+<input type="email" placeholder="Email" required>
+
+<label>Datum od:</label>
+<input type="date" id="from" required>
+
+<label>Datum do:</label>
+<input type="date" id="to" required>
+
+<select id="vip">
+<option value="0">Bez VIP</option>
+<option value="0.3">VIP servis</option>
+</select>
+
+<button>Vypočítat & rezervovat</button>
+</form>
+
+<h3 id="total" style="text-align:center;margin-top:30px;"></h3>
+</section>
+
+<footer>
+© 2026 BoutForRich – Real Luxury Yacht Rental
+</footer>
+
+<script>
+
+/* =========================================================
+   DATA – SKUTEČNÉ INTERIÉRY JACHT
+========================================================= */
+
+const tours = [
+{
+images:[
+"https://images.unsplash.com/photo-1567899378494-47b22a2ae96a", // salon
+"https://images.unsplash.com/photo-1569263979104-865ab7cd8d13", // kajuta
+"https://images.unsplash.com/photo-1600195077078-7c815f540a3c"  // exteriér
+],
+text:"Golden Majesty 52 nabízí luxusní salon s koženým sezením, plně vybavenou kuchyň a prostorné kajuty."
+},
+{
+images:[
+"https://images.unsplash.com/photo-1578926287914-3d7a5f7e36f4",
+"https://images.unsplash.com/photo-1554995207-c18c203602cb",
+"https://images.unsplash.com/photo-1569263979104-865ab7cd8d13"
+],
+text:"Royal Interior 60 je zaměřena na interiér – designový nábytek, koupelny a ložnice."
+},
+{
+images:[
+"https://images.unsplash.com/photo-1599586120429-48281b6f0ece",
+"https://images.unsplash.com/photo-1618221195710-dd6b41faaea6",
+"https://images.unsplash.com/photo-1615529328331-f8917597711f"
+],
+text:"Diamond Suite Yacht představuje absolutní špičku v oblasti luxusních interiérů."
+}
+];
+
+let currentImages=[];
+let index=0;
+
+/* =========================================================
+   PROHLÍDKA
+========================================================= */
+
+function startTour(i){
+    document.getElementById("tour").style.display="block";
+    currentImages=tours[i].images;
+    document.getElementById("tourText").innerText=tours[i].text;
+    index=0;
+    slide();
+    window.scrollTo({top:document.getElementById("tour").offsetTop,behavior:"smooth"});
+}
+
+function slide(){
+    document.getElementById("slide").src=currentImages[index];
+    index=(index+1)%currentImages.length;
+    setTimeout(slide,3500);
+}
+
+/* =========================================================
+   REZERVACE
+========================================================= */
+
+function reserve(e){
+    e.preventDefault();
+    const from=new Date(document.getElementById("from").value);
+    const to=new Date(document.getElementById("to").value);
+    const days=(to-from)/(1000*60*60*24);
+    const vip=parseFloat(document.getElementById("vip").value);
+
+    if(days<=0){
+        alert("Neplatné datum");
+        return;
+    }
+
+    let base=150000;
+    let price=days*base*(1+vip);
+
+    document.getElementById("total").innerText=
+        "Celková cena: "+price.toLocaleString()+" Kč";
+
+    console.log("REZERVACE:",days,price);
+}
+
+</script>
+
+</body>
+</html>
