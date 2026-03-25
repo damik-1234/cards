@@ -1,0 +1,89 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f0f0f0;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  gap: 5px;
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border: 2px solid black;
+  font-size: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background: #ddd;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+.X {
+  color: red;
+}
+.O {
+  color: blue;
+}
+.win-X {
+  background-color: red; /* červená */
+}
+
+.win-O {
+  background-color: blue; /* modrá */
+}
+
+.draw {
+  background: linear-gradient(to right, red 50%, blue 50%);
+}
+body {
+  transition: background 0.5s ease;
+}
+.winner {
+  background-color: rgb(255, 255, 5);
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+@keyframes blink {
+  0% { background-color: yellow; }
+  50% { background-color: transparent; }
+  100% { background-color: yellow; }
+}
+
+@keyframes blink-red {
+  0% { background-color: rgba(255, 0, 0, 0.7); }
+  50% { background-color: transparent; }
+  100% { background-color: rgba(255, 0, 0, 0.7); }
+}
+
+@keyframes blink-blue {
+  0% { background-color: rgba(0, 0, 255, 0.7); }
+  50% { background-color: transparent; }
+  100% { background-color: rgba(0, 0, 255, 0.7); }
+}
+
+.winner-X {
+  animation: blink-red 0.6s infinite;
+}
+
+.winner-O {
+  animation: blink-blue 0.6s infinite;
+}
